@@ -5,7 +5,7 @@
 // cases' order. Outside a container MAKEFUN_INPUT_DIR and MAKEFUN_OUTPUT_DIR
 // stand in for /input and /output.
 
-import { readFileSync, writeFileSync } from 'node:fs';
+import { mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { setFlagsFromString } from 'node:v8';
 
@@ -50,4 +50,7 @@ const cases = validateCases(JSON.parse(readFileSync(join(INPUT_DIR, 'cases.json'
 const answers: unknown[] = [];
 for (const c of cases) answers.push(run(c.input));
 validateAnswers(cases, answers);
+// The harness mounts a writable /output, but a local run may point at a
+// directory that does not exist yet; creating it changes no graded output.
+mkdirSync(OUTPUT_DIR, { recursive: true });
 writeFileSync(join(OUTPUT_DIR, 'answers.json'), JSON.stringify(answers));
